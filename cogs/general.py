@@ -1,20 +1,22 @@
 """cog that contains general stuff"""
 
-from config import EXTENSIONS
-
+import discord
 from discord.ext import commands
+
+from utils.config import EXTENSIONS
+
 
 class General(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='ping', help='Check if the bot is responsive')
+    @commands.command(name="ping")
     async def ping(self, ctx):
-        """is it up ??"""
-        await ctx.send('Pong!')
+        """check if i am up"""
+        await ctx.send("Pong!")
 
     @commands.command()
-    @commands.has_permissions(administrator=True)
+    @commands.is_owner()
     async def reload(self, ctx):
         """reload all my extensions"""
         for ext in EXTENSIONS:
@@ -22,11 +24,16 @@ class General(commands.Cog):
         await ctx.send("Extensions reloaded")
 
     @commands.command()
-    @commands.has_permissions(administrator=True)
+    @commands.is_owner()
     async def sync(self, ctx):
-        """sync the tree"""
+        """sync my tree"""
         await self.bot.tree.sync()
         await ctx.send("Command tree synced")
+
+    async def on_cog_command_error(self, ctx, error):
+        """error handling"""
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("You don't have the required permissions.")
 
 
 async def setup(bot):
